@@ -11,6 +11,7 @@ using System.Threading;
 using System.Web;
 using System.Net.Http;
 using knn_hackathon.Models;
+using System.Collections.Generic;
 
 namespace knnFunctions
 {
@@ -89,7 +90,7 @@ namespace knnFunctions
 
             client.DefaultRequestHeaders.Remove("Ocp-Apim-Subscription-Key");
 
-            IndexedVideoResponse videoResponse = null;
+            List<IndexedVideoResponse> videoResponses = new List<IndexedVideoResponse>();
 
             // wait for the video index to finish
             while (true)
@@ -98,7 +99,7 @@ namespace knnFunctions
 
                 var videoGetIndexRequestResult = client.GetAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos/{videoId}/Index?accessToken={videoAccessToken}&language=English").Result;
                 var videoGetIndexResult = await videoGetIndexRequestResult.Content.ReadAsStringAsync();
-                videoResponse = JsonConvert.DeserializeObject<IndexedVideoResponse>(videoGetIndexResult);
+                var checkResponse = JsonConvert.DeserializeObject<IndexedVideoResponse>(videoGetIndexResult);
 
                 var processingState = JsonConvert.DeserializeObject<dynamic>(videoGetIndexResult)["state"];
 
@@ -112,8 +113,44 @@ namespace knnFunctions
                     Console.WriteLine("");
                     Console.WriteLine("Full JSON:");
                     Console.WriteLine(videoGetIndexResult);
+
+                    videoResponses.Add(checkResponse);
+
                     break;
                 }
+            }
+
+            List<string> additionalLanguages = new List<string>() { "French", "German", "Italian" };
+
+            foreach (var lang in additionalLanguages)
+            {
+                var videoGetIndexRequestResult = client.GetAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos/{videoId}/Index?accessToken={videoAccessToken}&language={lang}").Result;
+                var videoGetIndexResult = await videoGetIndexRequestResult.Content.ReadAsStringAsync();
+                var checkResponse = JsonConvert.DeserializeObject<IndexedVideoResponse>(videoGetIndexResult);
+
+                while (true)
+                {
+                    Thread.Sleep(2000);
+
+                    var processingState = JsonConvert.DeserializeObject<dynamic>(videoGetIndexResult)["state"];
+
+                    Console.WriteLine("Getting languages");
+                    Console.WriteLine("State:");
+                    Console.WriteLine(processingState);
+
+                    // job is finished
+                    if (processingState != "Uploaded" && processingState != "Processing")
+                    {
+                        Console.WriteLine("");
+                        Console.WriteLine("Full JSON:");
+                        Console.WriteLine(videoGetIndexResult);
+
+                        videoResponses.Add(checkResponse);
+
+                        break;
+                    }
+                }
+                
             }
 
             // search for the video
@@ -143,27 +180,45 @@ namespace knnFunctions
             Console.WriteLine("Video Captions:");
             Console.WriteLine(videoCaptionsResponse);
 
-            var catalogueVideo = MapVideoResponseToCatalogueVideo(videoResponse, insightsWidgetLink.AbsolutePath, playerWidgetLink.AbsolutePath);
+            var catalogueVideo = MapVideoResponseToCatalogueVideo(videoResponses, insightsWidgetLink.AbsolutePath, playerWidgetLink.AbsolutePath);
 
             await cosmosClient.StoreVideoDetails(catalogueVideo);
         }
 
-        private static CatalogueVideo MapVideoResponseToCatalogueVideo(IndexedVideoResponse response, string widgetLink, string videoPlayerUrl)
+        private static CatalogueVideo MapVideoResponseToCatalogueVideo(List<IndexedVideoResponse> responses, string widgetLink, string videoPlayerUrl)
         {
-            return new CatalogueVideo
+            var englishIndex = responses[0];
+
+            var cosmosDoc = new CatalogueVideo
             {
                 doctype = "catalogueVideo",
-                durationInSeconds = response.durationInSeconds,
-                id = response.id,
-                labels = response.videos[0].insights.labels,
-                language = response.videos[0].language,
-                languages = response.videos[0].insights.languages,
-                name = response.name,
-                thumbnailId = response.videos[0].thumbnailId,
-                transcription = response.videos[0].insights.transcript,
+                durationInSeconds = englishIndex.durationInSeconds,
+                id = englishIndex.id,
+                name = englishIndex.name,
+                thumbnailId = englishIndex.videos[0].thumbnailId,
                 videoPlayerUrl = videoPlayerUrl,
-                widgetUrl = widgetLink
+                widgetUrl = widgetLink,
+                languages = new List<string>(),
+                transcription = new List<LanguageTranscription>(),
+                labels = new List<LanguageLabels>()
             };
+
+            foreach (var response in responses)
+            {
+                cosmosDoc.transcription.Add(new LanguageTranscription()
+                {
+                    languageCode = response.videos[0].language,
+                    transcription = response.videos[0].insights.transcript
+                });
+                cosmosDoc.labels.Add(new LanguageLabels()
+                {
+                    languageCode = response.videos[0].language,
+                    labels = response.videos[0].insights.labels
+                });
+                cosmosDoc.languages.Add(response.videos[0].language);
+            }
+
+            return cosmosDoc;
         }
     }
 }
