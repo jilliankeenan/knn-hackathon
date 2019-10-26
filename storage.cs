@@ -57,10 +57,13 @@ namespace knnFunctions
       }
     }
 
-    public IEnumerable<CatalogueVideo> FetchCatalogue()
+    public IEnumerable<allCatalogue> FetchCatalogue()
     {
-      return this.container.GetItemLinqQueryable<CatalogueVideo>(true)
+      return this.container.GetItemLinqQueryable<allCatalogue>(true)
         .AsEnumerable();
     }
-  }
+
+      
+    }
+
 }
