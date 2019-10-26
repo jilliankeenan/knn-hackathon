@@ -23,7 +23,7 @@ function App() {
                         <Route path="/catalogue">
                             <CataloguePage />
                         </Route>
-                        <Route path="/result">
+                        <Route path="/result/:videoId">
                             <ResultPage />
                         </Route>
                         <Route path="/">
