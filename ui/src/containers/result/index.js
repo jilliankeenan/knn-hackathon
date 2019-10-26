@@ -28,7 +28,12 @@ const ResultPage = () => {
                     </VideoContainer>
                     <TranscriptionPaneContainer>
                         <ControlBar>
-                            <Select />
+                            <Select>
+                                <option>English</option>
+                                <option>Spanish</option>
+                                <option>French</option>
+                                <option>Swedish</option>
+                            </Select>
                         </ControlBar>
                         Transcription Pane
                     </TranscriptionPaneContainer>
