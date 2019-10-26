@@ -28,10 +28,28 @@ namespace knnFunctions
     // The name of the database and container we will create
     private string databaseId = "KnnVideos";
     private string containerId = "VideoDetails";
+    private string partitionKeyPath = "/id";
 
     public CosmosStorage()
     {
 
+    }
+
+    public async Task Connect()
+    {
+      this.cosmosClient = new CosmosClient(EndpointUrl, PrimaryKey);
+      this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+      this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, partitionKeyPath);
+    }
+
+    public async Task StoreVideoDetails(Object details)
+    {
+      try {
+      ItemResponse<Object> response = await this.container.CreateItemAsync<Object>(details, new PartitionKey("details.id"));
+      } catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
+      {
+        Console.WriteLine("Item in database with id: {0} already exists\n", "details.id");
+      }
     }
   }
 }
