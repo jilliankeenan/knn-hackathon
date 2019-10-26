@@ -39,7 +39,7 @@ namespace knnFunctions
 
     public async Task<CosmosStorage> Connect()
     {
-        this.cosmosClient = new CosmosClient(EndpointUrl, PrimaryKey);
+        this.cosmosClient = new CosmosClient("AccountEndpoint=https://knnstore.documents.azure.com:443/;AccountKey=ZoKXOb3asXozk6BKjncPhJkVM4JB2uKgSnxXXToSJphXcNB3kxyW8BFg24i79b1cwlMTLnoFjZFtPOfH1gy2vg==;");
         this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
         this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, partitionKeyPath);
         return this;

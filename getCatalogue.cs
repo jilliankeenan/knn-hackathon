@@ -6,28 +6,32 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace knnFunctions
 {
     public static class getCatalogue
-    {
+        {
+         
+        private static CosmosStorage storage = new CosmosStorage();
+
+
         [FunctionName("getCatalogue")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "getCatalogue")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("Retrieving information from all the DB");
-
-            string name = req.Query["name"];
+            Console.WriteLine("Beginning to Retrieve Information from the DB");
           
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            await storage.Connect();
+            var catalogue = storage.FetchCatalogue();
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return new OkObjectResult(catalogue);
         }
     }
-}
+
+    
+      
+    }
