@@ -55,6 +55,7 @@ const CataloguePage = () => {
                 </Dropzone>
                 {catalogueData.map((data, index) => (
                     <div key={index}>
+                        <Link url="/result/`{$catalogueData[index].durationInSeconds}`">
                         <VideoContainer>
                             <ImageContainer src={VideoImage} ></ImageContainer>
                             <VideoDetailsContainer>
@@ -62,6 +63,7 @@ const CataloguePage = () => {
                                 <h1>Duration: {Math.floor(catalogueData[index].durationInSeconds / 60)} minute(s)</h1>
                             </VideoDetailsContainer>
                         </VideoContainer>
+                        </Link>
                     </div>
                 ))}
             </PageContainer>
