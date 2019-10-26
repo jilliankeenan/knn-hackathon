@@ -5,6 +5,7 @@ import { Heading } from '../../components/Heading';
 import VideoPlayer from '../../components/VideoPlayer';
 import SearchBar from '../../components/SearchBar';
 import Select from '../../components/Select';
+import TranscriptionPane from '../../components/TranscriptionPane';
 import { PageContainer, FlexContainer, VideoContainer, TranscriptionPaneContainer, ControlBar, VideoQualityIndicator } from './styled';
 
 const ResultPage = () => {
@@ -35,7 +36,7 @@ const ResultPage = () => {
                                 <option>Swedish</option>
                             </Select>
                         </ControlBar>
-                        Transcription Pane
+                        <TranscriptionPane text={mockData.transcriptionText} />
                     </TranscriptionPaneContainer>
                 </FlexContainer>
             </PageContainer>
