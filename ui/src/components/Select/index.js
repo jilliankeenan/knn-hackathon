@@ -1,16 +1,10 @@
 import React from 'react';
 import { StyledSelect } from './styled'
 
-const Select = () => {
+const Select = ({...rest}) => {
 
     return (
-        <StyledSelect>
-            <option>test</option>
-            <option>test</option>
-            <option>test</option>
-            <option>test</option>
-        </StyledSelect>
-    );
+        <StyledSelect {...rest} />);
 }
 
 export default Select;

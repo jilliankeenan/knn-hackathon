@@ -1,15 +1,19 @@
-import React from 'react';
-import { Video } from './styled';
+import React, { forwardRef } from 'react';
+import { Wrapper } from './styled';
+import ReactPlayer from 'react-player'
 
-const VideoPlayer = () => {
+const VideoPlayer = forwardRef(({ url, ...rest }, ref) => {
 
     return (
-        <Video width="400" controls>
-            <source src="mov_bbb.mp4" type="video/mp4" />
-            <source src="mov_bbb.ogg" type="video/ogg" />
-            Your browser does not support HTML5 video.
-        </Video>
+        <ReactPlayer
+            ref={ref}
+            url={url}
+            playing
+            controls
+            wrapper={Wrapper}
+            {...rest}
+        />
     );
-};
+});
 
 export default VideoPlayer;
