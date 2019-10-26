@@ -63,7 +63,14 @@ namespace knnFunctions
         .AsEnumerable();
     }
 
-      
+    public IEnumerable<CatalogueVideo> FetchSpecificCatalogue(string catID)
+    {
+
+      return this.container.GetItemLinqQueryable<CatalogueVideo>(true)
+          .Where(video => video.id.Equals(catID))
+        .AsEnumerable();
+    }
+        
     }
 
 }
