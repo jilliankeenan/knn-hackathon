@@ -13,8 +13,8 @@ using System.Collections.Generic;
 namespace knnFunctions
 {
     public static class getCatalogue
-        {
-         
+    {
+
         private static CosmosStorage storage = new CosmosStorage();
 
 
@@ -24,14 +24,13 @@ namespace knnFunctions
             ILogger log)
         {
             Console.WriteLine("Beginning to Retrieve Information from the DB");
-          
+
             await storage.Connect();
+            Console.WriteLine("Successfully Connected to the Database");
             var catalogue = storage.FetchCatalogue();
 
+            Console.WriteLine("Data successfully retrieved. Returning Results.");
             return new OkObjectResult(catalogue);
         }
     }
-
-    
-      
-    }
+}
