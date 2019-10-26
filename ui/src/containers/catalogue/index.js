@@ -7,7 +7,7 @@ import { catalogueData } from './mockDataCatalogue';
 import { ImageContainer } from './styled';
 const CataloguePage = () => {
 
-    // sensusApiCall(topic) {
+    // vidarCall(video) {
     //     return new Promise((resolve, reject) => {
     //         vidarProxy('', 'POST', {
     //             //POST REQUEST
@@ -23,15 +23,22 @@ const CataloguePage = () => {
     //     })
     // }
     console.log(catalogueData)
+
     return (
         <Fragment>
             <h1>Video Catalogue</h1>
             <Link to="/result">Link to a result page</Link>
-            {catalogueDataData.map(data => (
-            <div> 
+            {catalogueData.map((data, index) => (
+            <div key={index}> 
                 <ImageContainer src={VideoImage} ></ImageContainer>
+                <div>
+                    <p>{data.videoStatus}</p>
+                    <p>{data.videoName}</p>      
+                    <p>{data.runTime}</p>
+                </div>
             </div>
-            ))}
+            
+            ))};
         </ Fragment>
     );
 };
