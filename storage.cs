@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Collections.Generic;
 using System.Net;
 using System.Linq;
+using knn_hackathon.Models;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 
@@ -43,21 +44,21 @@ namespace knnFunctions
       this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, partitionKeyPath);
     }
 
-    public async Task StoreVideoDetails(Object details)
+    public async Task StoreVideoDetails(IndexedVideo details)
     {
       try
       {
-        ItemResponse<Object> response = await this.container.CreateItemAsync<Object>(details, new PartitionKey("details.id"));
+        ItemResponse<IndexedVideo> response = await this.container.CreateItemAsync<IndexedVideo>(details, new PartitionKey(details.id));
       }
       catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
       {
-        Console.WriteLine("Item in database with id: {0} already exists\n", "details.id");
+        Console.WriteLine("Item in database with id: {0} already exists\n", details.id);
       }
     }
 
-    public IEnumerable<Object> FetchCatalogue()
+    public IEnumerable<IndexedVideo> FetchCatalogue()
     {
-      return this.container.GetItemLinqQueryable<Object>(true)
+      return this.container.GetItemLinqQueryable<IndexedVideo>(true)
         .AsEnumerable();
     }
   }
