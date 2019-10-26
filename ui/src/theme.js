@@ -6,6 +6,9 @@ export default {
         secondary: '#f19953b3',
         background: 'white',
         focus: '#2cade654',
+        positive: '#28a745',
+        medium: '#f0ad4e',
+        negative: '#dc3545',
         grey: {
             default: '#8c91ab4f',
             dark: '#8c91aba3',
@@ -23,6 +26,11 @@ export default {
 
     radii: {
         default: '4px'
+    },
+
+    fonts: {
+        headings: "'Palanquin'",
+        body: "'Roboto'"
     }
 
 };

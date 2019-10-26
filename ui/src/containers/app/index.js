@@ -2,7 +2,7 @@ import React from 'react';
 import CataloguePage from '../catalogue';
 import ResultPage from '../result';
 import '../../reset.css';
-import { Nav, AppContainer, NavLink } from './styled'
+import { Nav, AppContainer, Brand } from './styled'
 import { ThemeProvider } from 'styled-components';
 import theme from '../../theme';
 import {
@@ -17,7 +17,7 @@ function App() {
             <Router>
                 <AppContainer>
                     <Nav>
-                        <NavLink to="/catalogue">App Name</NavLink>
+                        <Brand to="/catalogue">App Name</Brand>
                     </Nav>
                     <Switch>
                         <Route path="/catalogue">
