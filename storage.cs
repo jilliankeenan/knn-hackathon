@@ -13,10 +13,10 @@ namespace knnFunctions
   public class CosmosStorage
   {
     /// The Azure Cosmos DB endpoint for running this GetStarted sample.
-    private string EndpointUrl = Environment.GetEnvironmentVariable("EndpointUrl");
+    private string EndpointUrl = "https://knnstore.documents.azure.com:443/";
 
     /// The primary key for the Azure DocumentDB account.
-    private string PrimaryKey = Environment.GetEnvironmentVariable("PrimaryKey");
+    private string PrimaryKey = "ZoKXOb3asXozk6BKjncPhJkVM4JB2uKgSnxXXToSJphXcNB3kxyW8BFg24i79b1cwlMTLnoFjZFtPOfH1gy2vg==";
 
     // The Cosmos client instance
     private CosmosClient cosmosClient;
@@ -37,18 +37,19 @@ namespace knnFunctions
 
     }
 
-    public async Task Connect()
+    public async Task<CosmosStorage> Connect()
     {
-      this.cosmosClient = new CosmosClient(EndpointUrl, PrimaryKey);
-      this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
-      this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, partitionKeyPath);
+        this.cosmosClient = new CosmosClient(EndpointUrl, PrimaryKey);
+        this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+        this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, partitionKeyPath);
+        return this;
     }
 
-    public async Task StoreVideoDetails(IndexedVideo details)
+    public async Task StoreVideoDetails(CatalogueVideo details)
     {
       try
       {
-        ItemResponse<IndexedVideo> response = await this.container.CreateItemAsync<IndexedVideo>(details, new PartitionKey(details.id));
+        ItemResponse<CatalogueVideo> response = await this.container.CreateItemAsync<CatalogueVideo>(details, new PartitionKey(details.id));
       }
       catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
       {
@@ -56,9 +57,9 @@ namespace knnFunctions
       }
     }
 
-    public IEnumerable<IndexedVideo> FetchCatalogue()
+    public IEnumerable<CatalogueVideo> FetchCatalogue()
     {
-      return this.container.GetItemLinqQueryable<IndexedVideo>(true)
+      return this.container.GetItemLinqQueryable<CatalogueVideo>(true)
         .AsEnumerable();
     }
   }

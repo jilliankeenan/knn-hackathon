@@ -23,21 +23,23 @@ namespace knnFunctions
         {
             log.LogInformation("Uploading to Microsoft");
 
-            string name = req.Query["name"];
-
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            string name = data.name;
+            string description = data.description;
+            string videoUrl = data.videoUrl;
 
-            IndexFile(name);
+            await IndexFile(videoUrl, name, description);
 
             return name != null
                 ? (ActionResult)new OkObjectResult($"Hello, {name}")
                 : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }
 
-        private static void IndexFile(string videoUrl)
+        private static async Task IndexFile(string videoUrl, string name, string description)
         {
+            CosmosStorage cosmosClient = await new CosmosStorage().Connect();
+
             var apiUrl = "https://api.videoindexer.ai";
             var accountId = "7925d38f-a4d8-4180-9071-c2b8a1298249";
             var location = "trial";
@@ -52,8 +54,9 @@ namespace knnFunctions
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", apiKey);
 
             // obtain account access token
-            var accountAccessTokenRequestResult = client.GetAsync($"{apiUrl}/auth/{location}/Accounts/{accountId}/AccessToken?allowEdit=true").Result;
-            var accountAccessToken = accountAccessTokenRequestResult.Content.ReadAsStringAsync().Result.Replace("\"", "");
+            var accountAccessTokenRequestResult = await client.GetAsync($"{apiUrl}/auth/{location}/Accounts/{accountId}/AccessToken?allowEdit=true");
+            var accountAccessToken = await accountAccessTokenRequestResult.Content.ReadAsStringAsync();
+            accountAccessToken = accountAccessToken.Replace("\"", "");
 
             client.DefaultRequestHeaders.Remove("Ocp-Apim-Subscription-Key");
 
@@ -70,11 +73,8 @@ namespace knnFunctions
             //video.Read(buffer, 0, buffer.Length);
             //content.Add(new ByteArrayContent(buffer));
 
-            string name = "Test3";
-            string description = "Test3";
-
-            var uploadRequestResult = client.PostAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos?accessToken={accountAccessToken}&name={name}&description={description}&privacy=private&partition=TestPartition2&videoUrl={videoUrl}", content).Result;
-            var uploadResult = uploadRequestResult.Content.ReadAsStringAsync().Result;
+            var uploadRequestResult = await client.PostAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos?accessToken={accountAccessToken}&name={name}&description={description}&privacy=private&partition=TestPartition2&videoUrl={videoUrl}", content);
+            var uploadResult = await uploadRequestResult.Content.ReadAsStringAsync();
 
             // get the video id from the upload result
             var videoId = JsonConvert.DeserializeObject<dynamic>(uploadResult)["id"];
@@ -83,8 +83,9 @@ namespace knnFunctions
 
             // obtain video access token            
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", apiKey);
-            var videoTokenRequestResult = client.GetAsync($"{apiUrl}/auth/{location}/Accounts/{accountId}/Videos/{videoId}/AccessToken?allowEdit=true").Result;
-            var videoAccessToken = videoTokenRequestResult.Content.ReadAsStringAsync().Result.Replace("\"", "");
+            var videoTokenRequestResult = await client.GetAsync($"{apiUrl}/auth/{location}/Accounts/{accountId}/Videos/{videoId}/AccessToken?allowEdit=true");
+            var videoAccessToken = await videoTokenRequestResult.Content.ReadAsStringAsync();
+            videoAccessToken = videoAccessToken.Replace("\"", "");
 
             client.DefaultRequestHeaders.Remove("Ocp-Apim-Subscription-Key");
 
@@ -96,7 +97,7 @@ namespace knnFunctions
                 Thread.Sleep(10000);
 
                 var videoGetIndexRequestResult = client.GetAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos/{videoId}/Index?accessToken={videoAccessToken}&language=English").Result;
-                var videoGetIndexResult = videoGetIndexRequestResult.Content.ReadAsStringAsync().Result;
+                var videoGetIndexResult = await videoGetIndexRequestResult.Content.ReadAsStringAsync();
                 videoResponse = JsonConvert.DeserializeObject<IndexedVideoResponse>(videoGetIndexResult);
 
                 var processingState = JsonConvert.DeserializeObject<dynamic>(videoGetIndexResult)["state"];
@@ -116,7 +117,7 @@ namespace knnFunctions
             }
 
             // search for the video
-            var searchRequestResult = client.GetAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos/Search?accessToken={accountAccessToken}&id={videoId}").Result;
+            var searchRequestResult = await client.GetAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos/Search?accessToken={accountAccessToken}&id={videoId}");
             var searchResult = searchRequestResult.Content.ReadAsStringAsync().Result;
             Console.WriteLine("");
             Console.WriteLine("Search:");
@@ -144,7 +145,7 @@ namespace knnFunctions
 
             var catalogueVideo = MapVideoResponseToCatalogueVideo(videoResponse, insightsWidgetLink.AbsolutePath, playerWidgetLink.AbsolutePath);
 
-
+            await cosmosClient.StoreVideoDetails(catalogueVideo);
         }
 
         private static CatalogueVideo MapVideoResponseToCatalogueVideo(IndexedVideoResponse response, string widgetLink, string videoPlayerUrl)
