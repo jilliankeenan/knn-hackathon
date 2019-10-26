@@ -1,4 +1,4 @@
-import React, { useCallback, Fragment } from 'react';
+import React, { useCallback, Fragment, useState } from 'react';
 import VideoImage from '../../../src/video.jpg'
 import {
     Link
@@ -6,52 +6,44 @@ import {
 import Dropzone, { useDropzone } from 'react-dropzone'
 import { catalogueData } from './mockDataCatalogue';
 import { ImageContainer, Input, VideoContainer, VideoDetailsContainer, PageContainer } from './styled';
-
-
-function MyDropzone() {
-    const onDrop = useCallback(acceptedFiles => {
-        // Do something with the files
-    }, [])
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-
-    return (
-        <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            {
-                isDragActive ?
-                    <p>Drop the files here ...</p> :
-                    <p>Drag 'n' drop some files here, or click to select files</p>
-            }
-        </div>
-    )
-}
+import { useFetch } from "./useEffect";
 
 const CataloguePage = () => {
-
-    function vidarCall() {
-        fetch('https://knn-functions.azurewebsites.net/api/getCatalogue')
-            .then(res => {
-
-                res.json().then((result) => {
-                    console.log(result)
-                })
-             
-            })
-            .then((data) => {
-                console.log(data)
-            }).catch(() => { console.log('something went wrong') })
+    const handleUploadFile = (acceptedFiles) => {
+        fetch('https://knn-functions.azurewebsites.net/api/ingest', { // Your POST endpoint
+            method: 'POST',
+            headers: {
+                // Content-Type may need to be completely **omitted**
+                // or you may need something
+                "Content-Type": "video/mp4"
+            },
+            body: acceptedFiles[0] // This is your file object
+        }).then(
+            response => response.json() // if the response is a JSON object
+        ).then(
+            success => console.log(success) // Handle the success response object
+        ).catch(
+            error => console.log(error) // Handle the error response object
+        );
     }
 
-    console.log(catalogueData)
 
+    fetch('https://knn-functions.azurewebsites.net/api/getCatalogue')
+    // .then(res => {
+    //     res.json().then((result) => {
+    //         setCatalogueData(result)
+    //     })
+    // }
+    const [catalogueData, loading] = useFetch(
+        "https://knn-functions.azurewebsites.net/api/getCatalogue"
+    )
+    console.log(catalogueData, "catalogue")
 
     return (
         <Fragment>
             <PageContainer>
-                {vidarCall()}
                 <h1>Video Catalogue</h1>
-                <Link to="/result">Link to a result page</Link>
-                <Dropzone onDrop={acceptedFiles => console.log(acceptedFiles)}>
+                <Dropzone onDrop={handleUploadFile}>
                     {({ getRootProps, getInputProps }) => (
                         <section>
                             <div {...getRootProps()}>
@@ -66,9 +58,8 @@ const CataloguePage = () => {
                         <VideoContainer>
                             <ImageContainer src={VideoImage} ></ImageContainer>
                             <VideoDetailsContainer>
-                                <h1>{data.videoName}</h1>
-                                <h1>{data.videoStatus}</h1>
-                                <h1>{data.runTime}</h1>
+                                <h1>Name: {catalogueData[index].name}</h1>
+                                <h1>Duration: {Math.floor(catalogueData[index].durationInSeconds / 60)} minute(s)</h1>
                             </VideoDetailsContainer>
                         </VideoContainer>
                     </div>

@@ -35,6 +35,8 @@ export const PageContainer = styled.div`
     width: 900px;
     box-shadow: ${({ theme }) => theme.shadows.default};
     border-radius: ${({ theme }) => theme.radii.default};
-   
+`;
 
+export const Header = styled.h1`
+    font-family: Roboto;
 `;
