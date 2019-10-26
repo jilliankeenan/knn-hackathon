@@ -21,8 +21,11 @@ const ResultPage = () => {
     const [resultData, setResultData] = useState(mockData);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentTokenIndex, setCurrentTokenIndex] = useState(0);
+    const [showSearchResults, setShowSearchResults] = useState(false);
+    const [textSearchResults, setTextSearchResults] = useState([]);
+    const [entitySearchResults, setEntitySearchResults] = useState([]);
 
-    console.log({ resultData, searchTerm });
+    // console.log({ resultData, searchTerm });
 
     const handleTokenClick = (tokenDetail) => {
         const firstInstance = tokenDetail.instances.length > 0 ? tokenDetail.instances[0] : null;
@@ -58,6 +61,46 @@ const ResultPage = () => {
         }
     };
 
+    const handleOnResultClick = (result) => {
+        const firstInstance = result.instances.length > 0 ? result.instances[0] : null;
+
+        if (!firstInstance) {
+            console.log('No instances! :(');
+            return;
+        }
+
+        const time = instanceToSeconds(firstInstance.start)
+        playerRef.current.seekTo(time, 'seconds');
+        setShowSearchResults(false);
+    };
+
+    const handleSearchTermChange = (event) => {
+        const value = event.target.value;
+
+        if (!value) {
+            setShowSearchResults(false);
+            setTextSearchResults({});
+            setEntitySearchResults({});
+        }
+
+        if (value && value.length > 2) {
+            setShowSearchResults(true);
+
+            const textSearchResults = resultData.transcription.filter(({ text }) => {
+                if (text && searchTerm && text.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    return true;
+                }
+            }).map((result) => ({ ...result, searchTerm }));
+
+            setTextSearchResults(textSearchResults);
+            setEntitySearchResults([{
+                token: 'something that is an entity'
+            }]);
+        }
+
+        setSearchTerm(event.target.value)
+    };
+
     return (
         <Fragment>
             <PageContainer>
@@ -66,14 +109,24 @@ const ResultPage = () => {
                     <VideoContainer>
                         <ControlBar>
                             <SearchBar
-                                onChange={(event) => setSearchTerm(event.target.value)}
+                                showSearchResults={showSearchResults}
+                                onKeyUp={handleSearchTermChange}
+                                // onBlur={() => setShowSearchResults(false)}
+                                textSearchResults={textSearchResults}
+                                entitySearchResults={entitySearchResults}
+                                onResultClick={handleOnResultClick}
+                                onFocus={() => {
+                                    if (searchTerm) {
+                                        setShowSearchResults(true)
+                                    }
+                                }}
                             />
                         </ControlBar>
                         <VideoPlayer
                             ref={playerRef}
                             url={resultData.videoPlayerUrl}
                             onProgress={handleOnProgress}
-                            progressInterval={500}
+                            progressInterval={50}
                         />
                         <VideoQualityIndicator
                             status={resultData.videoQuality}

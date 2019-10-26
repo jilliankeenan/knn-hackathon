@@ -30,3 +30,53 @@ export const Input = styled.input`
         border-color: ${({ theme }) => theme.colors.grey.dark};
     }
 `;
+
+export const Heading = styled.h2`
+    margin-top: 0;
+    margin-bottom: 0;
+    font-family: ${({ theme }) => theme.fonts.headings};
+`;
+
+export const ResultSection = styled.div`
+    width: 50%;
+`
+
+export const FloatingDiv = styled.div`
+    background: white;
+    position: absolute;
+    width: 605px;
+    margin-top: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
+    border-color: ${({ theme }) => theme.colors.grey.dark};
+    box-shadow: ${({ theme }) => theme.shadows.default};
+    padding: .5rem;
+    display: flex;
+    justify-content: space-between;
+    height: 300px
+    overflow-y: scroll;
+    z-index: 999;
+`;
+
+export const SearchResult = styled.div`
+    cursor: pointer;
+    padding: 5px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+
+    :hover {
+      background: #c7c7c738;
+    }
+`;
+
+export const TimeStamp = styled.div`
+    color: #8080809c;
+`;
+
+export const HighlightedTerm = styled.span`
+  background-color: #d0f3eb;
+  border-radius: 5px;
+  padding: 1px;
+  font-weight: 800;
+`;
