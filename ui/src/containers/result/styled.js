@@ -33,3 +33,9 @@ export const ControlBar = styled.div`
     width: 100%;
     padding-bottom: .5rem;
 `;
+
+export const KeyValuePair = styled.p`
+    color: #8080809c;
+    margin-top: 0;
+    margin-bottom: .5rem;
+`;

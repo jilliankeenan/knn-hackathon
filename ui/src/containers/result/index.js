@@ -7,7 +7,7 @@ import SearchBar from '../../components/SearchBar';
 import Select from '../../components/Select';
 import VideoQualityIndicator from '../../components/VideoQualityIndicator';
 import TranscriptionPane from '../../components/TranscriptionPane';
-import { PageContainer, FlexContainer, VideoContainer, TranscriptionPaneContainer, ControlBar } from './styled';
+import { PageContainer, FlexContainer, VideoContainer, TranscriptionPaneContainer, ControlBar, KeyValuePair } from './styled';
 
 const instanceToSeconds = (instanceTime) => {
     const time = instanceTime.split('.')[0];
@@ -105,10 +105,13 @@ const ResultPage = () => {
         setSearchTerm(event.target.value)
     };
 
+    const durationInMinutes = Math.floor(resultData.durationInSeconds / 60);
+
     return (
         <Fragment>
             <PageContainer>
                 <Heading>{resultData.name}</Heading>
+                <KeyValuePair>Around {durationInMinutes} minutes long</KeyValuePair>
                 <FlexContainer>
                     <VideoContainer>
                         <ControlBar>

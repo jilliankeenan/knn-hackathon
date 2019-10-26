@@ -2,6 +2,7 @@ export default {
     "name": "Some Video Name",
     "id": 343434343,
     "doctype": "video",
+    "durationInSeconds": 134,
     "transcription": [
         {
             "id": 1,
