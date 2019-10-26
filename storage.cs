@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Net;
+using System.Linq;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 
@@ -44,12 +45,20 @@ namespace knnFunctions
 
     public async Task StoreVideoDetails(Object details)
     {
-      try {
-      ItemResponse<Object> response = await this.container.CreateItemAsync<Object>(details, new PartitionKey("details.id"));
-      } catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
+      try
+      {
+        ItemResponse<Object> response = await this.container.CreateItemAsync<Object>(details, new PartitionKey("details.id"));
+      }
+      catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
       {
         Console.WriteLine("Item in database with id: {0} already exists\n", "details.id");
       }
+    }
+
+    public IEnumerable<Object> FetchCatalogue()
+    {
+      return this.container.GetItemLinqQueryable<Object>(true)
+        .AsEnumerable();
     }
   }
 }
