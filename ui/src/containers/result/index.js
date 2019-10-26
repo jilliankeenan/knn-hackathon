@@ -10,8 +10,9 @@ import { PageContainer, FlexContainer, VideoContainer, TranscriptionPaneContaine
 const ResultPage = () => {
     const { videoId } = useParams();
     const [resultData, setResultData] = useState(mockData);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    console.log({ resultData });
+    console.log({ resultData, searchTerm });
 
     return (
         <Fragment>
@@ -20,7 +21,7 @@ const ResultPage = () => {
                 <FlexContainer>
                     <VideoContainer>
                         <ControlBar>
-                            <SearchBar />
+                            <SearchBar onChange={(event) => setSearchTerm(event.target.value)} />
                         </ControlBar>
                         <VideoPlayer />
                         <VideoQualityIndicator>Video Quality Indicator</VideoQualityIndicator>
