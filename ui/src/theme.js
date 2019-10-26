@@ -3,8 +3,14 @@ export default {
 
     colors: {
         primary: '#2188B6',
-        secondary: '#F19953',
-        background: 'white'
+        secondary: '#f19953b3',
+        background: 'white',
+        focus: '#2cade654',
+        grey: {
+            default: '#8c91ab4f',
+            dark: '#8c91aba3',
+            text: '#8c91abad'
+        }
     },
 
     shadows: {
