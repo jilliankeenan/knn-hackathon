@@ -8,6 +8,7 @@ export const StyledSelect = styled.select`
     border: 2px solid ${({ theme }) => theme.colors.grey.default};
     outline: none;
     transition: .2s all ease;
+    cursor: pointer;
     
     ::-webkit-input-placeholder { /* Edge */
         color: ${({ theme }) => theme.colors.grey.text};
