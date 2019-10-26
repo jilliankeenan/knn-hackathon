@@ -15,7 +15,6 @@ namespace knnfunctions
     {
         private static CosmosStorage storage = new CosmosStorage();
 
-
         [FunctionName("getCatalogueId")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "getCatalogueId")] HttpRequest req,
