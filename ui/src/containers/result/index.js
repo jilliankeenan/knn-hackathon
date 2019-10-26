@@ -25,7 +25,7 @@ const ResultPage = () => {
     const [textSearchResults, setTextSearchResults] = useState([]);
     const [entitySearchResults, setEntitySearchResults] = useState([]);
 
-    // console.log({ resultData, searchTerm });
+    console.log({ resultData, searchTerm });
 
     const handleTokenClick = (tokenDetail) => {
         const firstInstance = tokenDetail.instances.length > 0 ? tokenDetail.instances[0] : null;
@@ -79,8 +79,8 @@ const ResultPage = () => {
 
         if (!value) {
             setShowSearchResults(false);
-            setTextSearchResults({});
-            setEntitySearchResults({});
+            setTextSearchResults([]);
+            setEntitySearchResults([]);
         }
 
         if (value && value.length > 2) {
@@ -92,10 +92,14 @@ const ResultPage = () => {
                 }
             }).map((result) => ({ ...result, searchTerm }));
 
+            const entitySearchResults = resultData.labels.filter(({ name }) => {
+                if (name && searchTerm && name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    return true;
+                }
+            }).map((result) => ({ ...result, searchTerm }));
+
             setTextSearchResults(textSearchResults);
-            setEntitySearchResults([{
-                token: 'something that is an entity'
-            }]);
+            setEntitySearchResults(entitySearchResults);
         }
 
         setSearchTerm(event.target.value)

@@ -17,14 +17,7 @@ const SearchBar = ({ showSearchResults, entitySearchResults, textSearchResults, 
                             console.log(result)
 
                             const firstEntry = result.instances.length > 0 && result.instances[0];
-
                             const splitText = result.text.split(result.searchTerm);
-
-                            console.log({ splitText });
-
-                            // if (!splitText || splitText.length === 0) {
-                            //     return;
-                            // }
 
                             return (
                                 <SearchResult onClick={() => onResultClick(result)} key={index}>
@@ -38,7 +31,17 @@ const SearchBar = ({ showSearchResults, entitySearchResults, textSearchResults, 
                         <Heading>
                             Entities
                         </Heading>
-                        {entitySearchResults.map((result, index) => <p onClick={() => onResultClick(result)} key={index}>{result.text}</p>)}
+                        {entitySearchResults.length === 0 && <p>No Results</p>}
+                        {entitySearchResults.map((result, index) => {
+                            const firstEntry = result.instances.length > 0 && result.instances[0];
+
+                            return (
+                                <SearchResult onClick={() => onResultClick(result)} key={index}>
+                                    <TimeStamp>{firstEntry.start}</TimeStamp>
+                                    {result.name}
+                                </SearchResult>
+                            );
+                        })}
                     </ResultSection>
                 </FloatingDiv>
             }

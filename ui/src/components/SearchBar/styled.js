@@ -34,6 +34,7 @@ export const Input = styled.input`
 export const Heading = styled.h2`
     margin-top: 0;
     margin-bottom: 0;
+    padding-left: 1.2rem;
     font-family: ${({ theme }) => theme.fonts.headings};
 `;
 
@@ -61,7 +62,9 @@ export const FloatingDiv = styled.div`
 
 export const SearchResult = styled.div`
     cursor: pointer;
-    padding: 5px;
+    padding: .5rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
     font-size: 0.9rem;
     border-radius: 4px;
 
