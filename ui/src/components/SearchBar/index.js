@@ -14,8 +14,6 @@ const SearchBar = ({ showSearchResults, entitySearchResults, textSearchResults, 
 
                         {textSearchResults.length === 0 && <p>No Results</p>}
                         {textSearchResults.map((result, index) => {
-                            console.log(result)
-
                             const firstEntry = result.instances.length > 0 && result.instances[0];
                             const splitText = result.text.split(result.searchTerm);
 

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Wrapper, Token } from './styled'
 
-const scrollToRef = (ref) => window.scrollTo(0, ref.current.offsetTop)   // General scroll to element function
-
 
 const TranscriptionPane = ({ transcription, onTokenClick, currentTokenIndex }) => {    
     const rawText = transcription
