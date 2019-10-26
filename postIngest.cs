@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System.Threading;
 using System.Web;
 using System.Net.Http;
+using knn_hackathon.Models;
 
 namespace knnFunctions
 {
@@ -27,6 +28,8 @@ namespace knnFunctions
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
+
+            IndexFile(name);
 
             return name != null
                 ? (ActionResult)new OkObjectResult($"Hello, {name}")
@@ -67,7 +70,10 @@ namespace knnFunctions
             //video.Read(buffer, 0, buffer.Length);
             //content.Add(new ByteArrayContent(buffer));
 
-            var uploadRequestResult = client.PostAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos?accessToken={accountAccessToken}&name=Test2&description=TestDesc2&privacy=private&partition=TestPartition2&videoUrl={videoUrl}", content).Result;
+            string name = "Test3";
+            string description = "Test3";
+
+            var uploadRequestResult = client.PostAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos?accessToken={accountAccessToken}&name={name}&description={description}&privacy=private&partition=TestPartition2&videoUrl={videoUrl}", content).Result;
             var uploadResult = uploadRequestResult.Content.ReadAsStringAsync().Result;
 
             // get the video id from the upload result
@@ -82,6 +88,8 @@ namespace knnFunctions
 
             client.DefaultRequestHeaders.Remove("Ocp-Apim-Subscription-Key");
 
+            IndexedVideoResponse videoResponse = null;
+
             // wait for the video index to finish
             while (true)
             {
@@ -89,6 +97,7 @@ namespace knnFunctions
 
                 var videoGetIndexRequestResult = client.GetAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos/{videoId}/Index?accessToken={videoAccessToken}&language=English").Result;
                 var videoGetIndexResult = videoGetIndexRequestResult.Content.ReadAsStringAsync().Result;
+                videoResponse = JsonConvert.DeserializeObject<IndexedVideoResponse>(videoGetIndexResult);
 
                 var processingState = JsonConvert.DeserializeObject<dynamic>(videoGetIndexResult)["state"];
 
@@ -133,13 +142,27 @@ namespace knnFunctions
             Console.WriteLine("Video Captions:");
             Console.WriteLine(videoCaptionsResponse);
 
-            // get video thumbnail url
-            var thumbnailId = "";
-            var videoThumbnailRequestResult = client.GetAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos/{videoId}/Thumbnails/{thumbnailId}?accessToken={videoAccessToken}").Result;
-            var videoThumbnailResponse = videoThumbnailRequestResult.Content.ReadAsStringAsync().Result;
-            Console.WriteLine("");
-            Console.WriteLine("Video Captions:");
-            Console.WriteLine(videoThumbnailResponse);
+            var catalogueVideo = MapVideoResponseToCatalogueVideo(videoResponse, insightsWidgetLink.AbsolutePath, playerWidgetLink.AbsolutePath);
+
+
+        }
+
+        private static CatalogueVideo MapVideoResponseToCatalogueVideo(IndexedVideoResponse response, string widgetLink, string videoPlayerUrl)
+        {
+            return new CatalogueVideo
+            {
+                doctype = "catalogueVideo",
+                durationInSeconds = response.durationInSeconds,
+                id = response.id,
+                labels = response.videos[0].insights.labels,
+                language = response.videos[0].language,
+                languages = response.videos[0].insights.languages,
+                name = response.name,
+                thumbnailId = response.videos[0].thumbnailId,
+                transcription = response.videos[0].insights.transcript,
+                videoPlayerUrl = videoPlayerUrl,
+                widgetUrl = widgetLink
+            };
         }
     }
 }
