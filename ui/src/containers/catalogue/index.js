@@ -1,4 +1,4 @@
-import React,{ useCallback, Fragment } from 'react';
+import React, { useCallback, Fragment } from 'react';
 import VideoImage from '../../../src/video.jpg'
 import {
     Link
@@ -28,27 +28,27 @@ function MyDropzone() {
 
 const CataloguePage = () => {
 
-    // vidarCall(video) {
-    //     return new Promise((resolve, reject) => {
-    //         vidarProxy('', 'POST', {
-    //             //POST REQUEST
-    //             .then((response) => {
-    //             //RECIEVE REQUEST
-    //         }),
-    //         }).catch((error) => {
-    //             reject({
-    //                 hasError: true,
-    //                 errorMessage: error
-    //             })
-    //         });
-    //     })
-    // }
+    function vidarCall() {
+        fetch('https://knn-functions.azurewebsites.net/api/getCatalogue')
+            .then(res => {
+
+                res.json().then((result) => {
+                    console.log(result)
+                })
+             
+            })
+            .then((data) => {
+                console.log(data)
+            }).catch(() => { console.log('something went wrong') })
+    }
+
     console.log(catalogueData)
 
 
     return (
         <Fragment>
             <PageContainer>
+                {vidarCall()}
                 <h1>Video Catalogue</h1>
                 <Link to="/result">Link to a result page</Link>
                 <Dropzone onDrop={acceptedFiles => console.log(acceptedFiles)}>
