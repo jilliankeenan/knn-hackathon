@@ -7,27 +7,29 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using knnFunctions;
 
 namespace knnfunctions
 {
     public static class getCatalogueId
     {
+        private static CosmosStorage storage = new CosmosStorage();
+
         [FunctionName("getCatalogueId")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "getCatalogueId/{catalogueid}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "getCatalogueId")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("Calling Database to Retrieve Specific Information");
 
-            string name = req.Query["name"];
+            string catID = req.Query["catalogueid"];
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            await storage.Connect();
+            Console.WriteLine("Successfully Connected to the Database");
+            var catalogueItem = storage.FetchSpecificCatalogue(catID);
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            Console.WriteLine("Data successfully retrieved. Returning Results.");
+            return new OkObjectResult(catalogueItem);
         }
     }
 }
