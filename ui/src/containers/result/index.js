@@ -5,8 +5,9 @@ import { Heading } from '../../components/Heading';
 import VideoPlayer from '../../components/VideoPlayer';
 import SearchBar from '../../components/SearchBar';
 import Select from '../../components/Select';
+import VideoQualityIndicator from '../../components/VideoQualityIndicator';
 import TranscriptionPane from '../../components/TranscriptionPane';
-import { PageContainer, FlexContainer, VideoContainer, TranscriptionPaneContainer, ControlBar, VideoQualityIndicator } from './styled';
+import { PageContainer, FlexContainer, VideoContainer, TranscriptionPaneContainer, ControlBar } from './styled';
 
 const ResultPage = () => {
     const { videoId } = useParams();
@@ -25,7 +26,7 @@ const ResultPage = () => {
                             <SearchBar onChange={(event) => setSearchTerm(event.target.value)} />
                         </ControlBar>
                         <VideoPlayer />
-                        <VideoQualityIndicator>Video Quality Indicator</VideoQualityIndicator>
+                        <VideoQualityIndicator status={resultData.videoQuality} />
                     </VideoContainer>
                     <TranscriptionPaneContainer>
                         <ControlBar>
@@ -36,7 +37,7 @@ const ResultPage = () => {
                                 <option>Swedish</option>
                             </Select>
                         </ControlBar>
-                        <TranscriptionPane text={mockData.transcriptionText} />
+                        <TranscriptionPane text={resultData.transcriptionText} />
                     </TranscriptionPaneContainer>
                 </FlexContainer>
             </PageContainer>
