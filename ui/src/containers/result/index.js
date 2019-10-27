@@ -7,7 +7,7 @@ import SearchBar from '../../components/SearchBar';
 import Select from '../../components/Select';
 import VideoQualityIndicator from '../../components/VideoQualityIndicator';
 import TranscriptionPane from '../../components/TranscriptionPane';
-import useFetch from '../../hooks/useFetch';
+import { useFetch } from '../../hooks/useFetch';
 import { PageContainer, FlexContainer, VideoContainer, TranscriptionPaneContainer, ControlBar, KeyValuePair } from './styled';
 
 const instanceToSeconds = (instanceTime) => {
@@ -30,6 +30,7 @@ const ResultPage = () => {
     const { videoId } = useParams();
     const [selectedLanguage, setSelectedLanguage] = useState('en-US');
     const [resultData, isLoading] = useFetch(`https://knn-functions.azurewebsites.net/api/getCatalogueId?catalogueid=${videoId}`);
+    const [videoUrl, isLoadingUrl] = useFetch(`http://knn-functions.azurewebsites.net/api/getVideoUrl/${videoId}`);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [currentTokenIndex, setCurrentTokenIndex] = useState(0);
@@ -135,13 +136,17 @@ const ResultPage = () => {
         }
     };
 
-    const durationInMinutes = Math.floor(resultData[0].durationInSeconds / 60);
-    const url = resultData[0].videoPlayerUrl.substring(1, resultData[0].videoPlayerUrl.length - 1);
+    let durationInMinutes, url;
+
+    if (!isLoadingUrl) {
+        durationInMinutes = Math.floor(resultData[0].durationInSeconds / 60);
+        url = videoUrl;
+    }
 
     return (
         <Fragment>
             <PageContainer>
-                {!isLoading && (
+                {!isLoading && !isLoadingUrl && (
                     <Fragment>
                         <Heading>{resultData[0].name}</Heading>
                         <KeyValuePair>Around {durationInMinutes} minutes long</KeyValuePair>
@@ -151,7 +156,6 @@ const ResultPage = () => {
                                     <SearchBar
                                         showSearchResults={showSearchResults}
                                         onKeyUp={handleSearchTermChange}
-                                        // onBlur={() => setShowSearchResults(false)}
                                         textSearchResults={textSearchResults}
                                         entitySearchResults={entitySearchResults}
                                         onResultClick={handleOnResultClick}

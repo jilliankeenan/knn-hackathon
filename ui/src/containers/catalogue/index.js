@@ -6,7 +6,7 @@ import {
 import Dropzone from 'react-dropzone'
 import { ImageContainer, CatalogueHeader, DropzoneMessage, NavLink, SubHeading, Heading, VideoContainer, VideoDetailsContainer, PageContainer, DropzoneContainer } from './styled';
 import { Heading as MainHeading } from '../../components/Heading';
-import { useFetch } from "./useEffect";
+import { useFetch } from "../../hooks/useFetch";
 
 const CataloguePage = () => {
     const handleUploadFile = (acceptedFiles) => {
@@ -27,13 +27,9 @@ const CataloguePage = () => {
         );
     }
 
-
-    fetch('https://knn-functions.azurewebsites.net/api/getCatalogue')
     const [catalogueData, loading] = useFetch(
         "https://knn-functions.azurewebsites.net/api/getCatalogue"
     )
-    console.log(catalogueData, "catalogue")
-
     return (
         <Fragment>
             <PageContainer>
@@ -55,7 +51,7 @@ const CataloguePage = () => {
                     <div key={index}>
                         <VideoContainer>
                             <NavLink to={`/result/${catalogueData[index].id}`}>
-                                <ImageContainer src={VideoImage} ></ImageContainer>
+                                <ImageContainer src={'https://marketingland.com/wp-content/ml-loads/2015/01/video-generic-ss-1920.jpg'} ></ImageContainer>
                                 <VideoDetailsContainer>
                                     <Heading>{catalogueData[index].name}</Heading>
                                     <SubHeading>Around {Math.floor(catalogueData[index].durationInSeconds / 60)} minute(s)</SubHeading>

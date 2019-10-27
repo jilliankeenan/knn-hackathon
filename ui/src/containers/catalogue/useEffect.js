@@ -15,4 +15,23 @@ function useFetch(url) {
   return [data, loading];
 }
 
-export { useFetch };
+function useFetches(urls) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  async function fetchUrl() {
+    let responses = [];
+    urls.forEach((url) => {
+      const response = await fetch(url);
+      responses.add(await response.json());
+    });
+    
+    setData(responses);
+    setLoading(false);
+  }
+  useEffect(() => {
+    fetchUrl();
+  }, []);
+  return [data, loading];
+}
+
+export { useFetch, seFetches };
