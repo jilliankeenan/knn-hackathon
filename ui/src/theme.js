@@ -2,7 +2,7 @@
 export default {
 
     colors: {
-        primary: '#2188B6',
+        primary: '#028AF4',
         secondary: '#f19953b3',
         background: 'white',
         focus: '#2cade654',

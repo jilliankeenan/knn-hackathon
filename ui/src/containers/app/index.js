@@ -10,6 +10,7 @@ import {
     Switch,
     Route,
 } from "react-router-dom";
+import logo from '../../logo.svg';
 
 function App() {
     return (
@@ -17,7 +18,9 @@ function App() {
             <Router>
                 <AppContainer>
                     <Nav>
-                        <Brand to="/catalogue">App Name</Brand>
+                        <Brand to="/catalogue">
+                            <img src={logo} height={32} width={32} alt="logo" />
+                            Vaidar Platform</Brand>
                     </Nav>
                     <Switch>
                         <Route path="/catalogue">
