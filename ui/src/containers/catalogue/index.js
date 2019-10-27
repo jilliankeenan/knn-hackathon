@@ -5,7 +5,8 @@ import {
 } from "react-router-dom";
 import Dropzone, { useDropzone } from 'react-dropzone'
 import { catalogueData } from './mockDataCatalogue';
-import { ImageContainer, Input, VideoContainer, VideoDetailsContainer, PageContainer } from './styled';
+import { ImageContainer, CatalogueHeader, NavLink, SubHeading, Heading, VideoContainer, VideoDetailsContainer, PageContainer } from './styled';
+import  { Heading as MainHeading } from '../../components/Heading';
 import { useFetch } from "./useEffect";
 
 const CataloguePage = () => {
@@ -17,9 +18,9 @@ const CataloguePage = () => {
                 // or you may need something
                 "Content-Type": "video/mp4"
             },
-            body: acceptedFiles[0] // This is your file object
+            body: acceptedFiles[0] // file object
         }).then(
-            response => response.json() // if the response is a JSON object
+            response => response.json() // JSON object
         ).then(
             success => console.log(success) // Handle the success response object
         ).catch(
@@ -29,11 +30,6 @@ const CataloguePage = () => {
 
 
     fetch('https://knn-functions.azurewebsites.net/api/getCatalogue')
-    // .then(res => {
-    //     res.json().then((result) => {
-    //         setCatalogueData(result)
-    //     })
-    // }
     const [catalogueData, loading] = useFetch(
         "https://knn-functions.azurewebsites.net/api/getCatalogue"
     )
@@ -42,7 +38,8 @@ const CataloguePage = () => {
     return (
         <Fragment>
             <PageContainer>
-                <h1>Video Catalogue</h1>
+                <CatalogueHeader>
+                <MainHeading>Video Catalogue</MainHeading>
                 <Dropzone onDrop={handleUploadFile}>
                     {({ getRootProps, getInputProps }) => (
                         <section>
@@ -53,17 +50,18 @@ const CataloguePage = () => {
                         </section>
                     )}
                 </Dropzone>
+                </CatalogueHeader>
                 {catalogueData.map((data, index) => (
                     <div key={index}>
-                        <Link url="/result/`{$catalogueData[index].durationInSeconds}`">
-                        <VideoContainer>
-                            <ImageContainer src={VideoImage} ></ImageContainer>
-                            <VideoDetailsContainer>
-                                <h1>Name: {catalogueData[index].name}</h1>
-                                <h1>Duration: {Math.floor(catalogueData[index].durationInSeconds / 60)} minute(s)</h1>
-                            </VideoDetailsContainer>
-                        </VideoContainer>
-                        </Link>
+                        <NavLink to={`/result/${catalogueData[index].id}`}>
+                            <VideoContainer>
+                                <ImageContainer src={VideoImage} ></ImageContainer>
+                                <VideoDetailsContainer>
+                                    <Heading>{catalogueData[index].name}</Heading>
+                                    <SubHeading>Around {Math.floor(catalogueData[index].durationInSeconds / 60)} minute(s)</SubHeading>
+                                </VideoDetailsContainer>
+                            </VideoContainer>
+                        </NavLink>
                     </div>
                 ))}
             </PageContainer>
