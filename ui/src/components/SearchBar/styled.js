@@ -83,3 +83,7 @@ export const HighlightedTerm = styled.span`
   padding: 1px;
   font-weight: 800;
 `;
+
+export const EmptyMessage = styled.p`
+    padding-left: 1.2rem;
+`;

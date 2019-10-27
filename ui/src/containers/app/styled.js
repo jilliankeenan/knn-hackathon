@@ -19,10 +19,17 @@ export const Brand = styled(Link)`
     font-size: 1.2rem;
     text-decoration: none;
     text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    letter-spacing: .5px;
+    font-family: ${({ theme }) => theme.fonts.primary};
+
+    img {
+        margin-right: 8px;
+    }
 `;
 
 export const AppContainer = styled.nav`
-
     background: ${({ theme }) => theme.colors.background};
     height: 100vh;
 `;
