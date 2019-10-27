@@ -1,43 +1,58 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.Threading;
-using System.Web;
-using System.Net.Http;
-using knn_hackathon.Models;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web;
+using KNN_CORE_API.Services;
+using knn_hackathon.Models;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
-namespace knnFunctions
+namespace KNN_CORE_API.Controllers
 {
-    public static class postIngest
+    [Route("api")]
+    [ApiController]
+    public class ValuesController : ControllerBase
     {
-        [FunctionName("postIngest")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "ingest")] HttpRequest req,
-            ILogger log)
+        [Route("test")]
+        [HttpGet]
+        public IActionResult Test()
         {
-            log.LogInformation("Uploading to Microsoft");
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            string name = data.name;
-            string description = data.description;
-            string videoUrl = data.videoUrl;
-
-            await IndexFile(videoUrl, name, description);
-
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return Ok("Poop");
         }
 
-        private static async Task IndexFile(string videoUrl, string name, string description)
+        [Route("ingest")]
+        [HttpPost]
+        public async Task<IActionResult> Ingest()
+        {
+            var file = Request.Form.Files[0];
+            if (file.Length > 0)
+            {
+                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                byte[] buffer = new byte[file.Length];
+                using (var stream = file.OpenReadStream())
+                {
+                    stream.Read(buffer, 0, buffer.Length);
+                }
+
+                await IndexFile(buffer, "qwe", "qwe");
+
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+            
+        }
+
+        private static async Task IndexFile(byte[] video, string name, string description)
         {
             CosmosStorage cosmosClient = await new CosmosStorage().Connect();
 
@@ -65,16 +80,16 @@ namespace knnFunctions
             var content = new MultipartFormDataContent();
             Console.WriteLine("Uploading...");
             // get the video from URL
-            videoUrl = HttpUtility.UrlEncode(videoUrl); // replace with the video URL
+            //videoUrl = HttpUtility.UrlEncode(videoUrl); // replace with the video URL
 
             // as an alternative to specifying video URL, you can upload a file.
             // remove the videoUrl parameter from the query string below and add the following lines:
             //FileStream video = File.OpenRead("C:\\Users\\sean\\Documents\\Video\\20191025_210512.mp4");
             //byte[] buffer = new byte[video.Length];
             //video.Read(buffer, 0, buffer.Length);
-            //content.Add(new ByteArrayContent(buffer));
-
-            var uploadRequestResult = await client.PostAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos?accessToken={accountAccessToken}&name={name}&description={description}&privacy=private&partition=TestPartition2&videoUrl={videoUrl}", content);
+            content.Add(new ByteArrayContent(video));
+            //&videoUrl={videoUrl}
+            var uploadRequestResult = await client.PostAsync($"{apiUrl}/{location}/Accounts/{accountId}/Videos?accessToken={accountAccessToken}&name={name}&description={description}&privacy=private&partition=TestPartition2", content);
             var uploadResult = await uploadRequestResult.Content.ReadAsStringAsync();
 
             // get the video id from the upload result
@@ -150,7 +165,7 @@ namespace knnFunctions
                         break;
                     }
                 }
-                
+
             }
 
             // search for the video
