@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Input, FloatingDiv, Heading, ResultSection, SearchResult, TimeStamp, HighlightedTerm } from './styled'
+import { Input, FloatingDiv, Heading, ResultSection, SearchResult, TimeStamp, HighlightedTerm, EmptyMessage } from './styled'
 
 const SearchBar = ({ showSearchResults, entitySearchResults, textSearchResults, onResultClick, ...rest }) => {
     return (
@@ -12,7 +12,7 @@ const SearchBar = ({ showSearchResults, entitySearchResults, textSearchResults, 
                             Text
                         </Heading>
 
-                        {textSearchResults.length === 0 && <p>No Results</p>}
+                        {textSearchResults.length === 0 && <EmptyMessage>No Results</EmptyMessage>}
                         {textSearchResults.map((result, index) => {
                             const firstEntry = result.instances.length > 0 && result.instances[0];
                             const splitText = result.text.split(result.searchTerm);
@@ -29,7 +29,7 @@ const SearchBar = ({ showSearchResults, entitySearchResults, textSearchResults, 
                         <Heading>
                             Entities
                         </Heading>
-                        {entitySearchResults.length === 0 && <p>No Results</p>}
+                        {entitySearchResults.length === 0 && <EmptyMessage>No Results</EmptyMessage>}
                         {entitySearchResults.map((result, index) => {
                             const firstEntry = result.instances.length > 0 && result.instances[0];
 

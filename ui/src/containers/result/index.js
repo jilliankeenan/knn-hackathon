@@ -37,12 +37,13 @@ const ResultPage = () => {
     const [textSearchResults, setTextSearchResults] = useState([]);
     const [entitySearchResults, setEntitySearchResults] = useState([]);
 
+    const currentTranscription = resultData[0] && resultData[0].transcription.find(({ languageCode }) => languageCode === selectedLanguage).transcription;
 
     if (isLoading || !resultData[0]) {
         return <p>Loading</p>;
     }
 
-    const confidences = resultData[0].transcription[0].transcription.map(({ confidence }) => confidence);
+    const confidences = resultData[0].transcription[0].transcription ? resultData[0].transcription[0].transcription.map(({ confidence }) => confidence) : [];
     const quality = confidences.reduce((a, b) => a + b, 0) / confidences.length;
     const qualityString = quality > 0.9 ? 'high' : (quality > 0.7 ? 'medium' : 'low')
 
@@ -60,25 +61,27 @@ const ResultPage = () => {
     };
 
     const handleOnProgress = ({ playedSeconds }) => {
-        const currentToken = resultData[0].transcription
-            .find(({ languageCode }) => languageCode === selectedLanguage).transcription
-            .find((token) => {
-                const firstInstance = token.instances.length > 0 ? token.instances[0] : null;
+        if (currentTranscription) {
+            const currentToken = resultData[0].transcription
+                .find(({ languageCode }) => languageCode === selectedLanguage).transcription
+                .find((token) => {
+                    const firstInstance = token.instances.length > 0 ? token.instances[0] : null;
 
-                if (!firstInstance) {
-                    return;
-                }
+                    if (!firstInstance) {
+                        return;
+                    }
 
-                const startTime = instanceToSeconds(firstInstance.start);
-                const endTime = instanceToSeconds(firstInstance.end);
+                    const startTime = instanceToSeconds(firstInstance.start);
+                    const endTime = instanceToSeconds(firstInstance.end);
 
-                if (playedSeconds > startTime && playedSeconds < endTime) {
-                    return true;
-                }
-            });
+                    if (playedSeconds > startTime && playedSeconds < endTime) {
+                        return true;
+                    }
+                });
 
-        if (currentToken) {
-            setCurrentTokenIndex(currentToken.id - 1)
+            if (currentToken) {
+                setCurrentTokenIndex(currentToken.id - 1)
+            }
         }
     };
 
@@ -96,37 +99,40 @@ const ResultPage = () => {
     };
 
     const handleSearchTermChange = (event) => {
-        const value = event.target.value;
+        if (currentTranscription) {
 
-        if (!value) {
-            setShowSearchResults(false);
-            setTextSearchResults([]);
-            setEntitySearchResults([]);
-        }
+            const value = event.target.value;
 
-        if (value && value.length > 2) {
-            setShowSearchResults(true);
+            if (!value) {
+                setShowSearchResults(false);
+                setTextSearchResults([]);
+                setEntitySearchResults([]);
+            }
 
-            const textSearchResults = resultData[0].transcription
-                .find(({ languageCode }) => languageCode === selectedLanguage).transcription
-                .filter(({ text }) => {
-                    if (text && searchTerm && text.toLowerCase().includes(searchTerm.toLowerCase())) {
+            if (value && value.length > 2) {
+                setShowSearchResults(true);
+
+                const textSearchResults = resultData[0].transcription
+                    .find(({ languageCode }) => languageCode === selectedLanguage).transcription
+                    .filter(({ text }) => {
+                        if (text && searchTerm && text.toLowerCase().includes(searchTerm.toLowerCase())) {
+                            return true;
+                        }
+                    })
+                    .map((result) => ({ ...result, searchTerm }));
+
+                const entitySearchResults = resultData[0].labels.filter(({ name }) => {
+                    if (name && searchTerm && name.toLowerCase().includes(searchTerm.toLowerCase())) {
                         return true;
                     }
-                })
-                .map((result) => ({ ...result, searchTerm }));
+                }).map((result) => ({ ...result, searchTerm }));
 
-            const entitySearchResults = resultData[0].labels.filter(({ name }) => {
-                if (name && searchTerm && name.toLowerCase().includes(searchTerm.toLowerCase())) {
-                    return true;
-                }
-            }).map((result) => ({ ...result, searchTerm }));
+                setTextSearchResults(textSearchResults);
+                setEntitySearchResults(entitySearchResults);
+            }
 
-            setTextSearchResults(textSearchResults);
-            setEntitySearchResults(entitySearchResults);
+            setSearchTerm(event.target.value);
         }
-
-        setSearchTerm(event.target.value)
     };
 
     const durationInMinutes = Math.floor(resultData[0].durationInSeconds / 60);
@@ -178,7 +184,7 @@ const ResultPage = () => {
                                 <TranscriptionPane
                                     currentTokenIndex={currentTokenIndex}
                                     onTokenClick={handleTokenClick}
-                                    transcription={resultData[0].transcription.find(({ languageCode }) => languageCode === selectedLanguage).transcription}
+                                    transcription={currentTranscription || []}
                                 />
                             </TranscriptionPaneContainer>
                         </FlexContainer>

@@ -15,6 +15,7 @@ const TranscriptionPane = ({ transcription, onTokenClick, currentTokenIndex }) =
 
     return (
         <Wrapper>
+            {!transcription || transcription.length === 0 && <p>No transcription available</p>}
             {rawText}
         </Wrapper>
     );

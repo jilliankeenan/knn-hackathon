@@ -32,11 +32,11 @@ export const VideoContainer = styled.div`
     width:400px;
     margin-top:2rem;
     margin-bottom:2rem;
-    border-radius: 5px;
-    border: 1px solid #eee;
+    border-radius: 7px;
+    border: 3px solid #eee;
+
     :hover {
-        -webkit-box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
-        box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
+        border: 3px solid ${({ theme }) => theme.colors.focus};
     }
     transition: .3s all ease;
 
@@ -45,7 +45,7 @@ export const VideoContainer = styled.div`
 export const VideoDetailsContainer = styled.div`
     display: flex;
     flex-direction: column;
-    padding: .5rem;
+    padding: .5rem 1rem;
 
 `;
 
@@ -64,7 +64,7 @@ export const Heading = styled.h1`
     padding-botton: 1.5rem;
     font-weight: bold;
     font-size: 1.8rem;
-    margin-bottom: .2rem;
+    margin-bottom: 0;
     margin-top: 0;
     color: black;
     text-decoration: none;
@@ -83,4 +83,45 @@ export const SubHeading = styled.h2`
 
 export const CatalogueHeader = styled.div`
     text-align: center;
+`;
+
+export const DropzoneContainer = styled.div`
+    font-size: ${({ theme }) => theme.fontSizes.lg};
+    border-radius: ${({ theme }) => theme.radii.default};
+    border: 2px dashed ${({ theme }) => theme.colors.primary};
+    padding: 1rem;
+    margin: 1.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    -webkit-appearance: none;
+    outline: none;
+    transition: .2s all ease;
+    cursor: pointer;
+    
+    ::-webkit-input-placeholder { /* Edge */
+        color: ${({ theme }) => theme.colors.grey.text};
+    }
+    
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: ${({ theme }) => theme.colors.grey.text};
+    }
+    
+    ::placeholder {
+        color: ${({ theme }) => theme.colors.grey.text};
+    }
+
+    &:focus, &:hover {
+        background: #d3d3d336;
+    }
+
+    width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+`;
+
+export const DropzoneMessage = styled.p`
+    color: ${({ isDark }) => isDark ? 'black' : 'lightgrey' };
+    font-size: ${({ isDark }) => isDark ? '' : '.95rem' };
+    margin-top: .2rem;
+    margin-bottom: 0;
 `;

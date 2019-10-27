@@ -1,12 +1,11 @@
-import React, { useCallback, Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import VideoImage from '../../../src/video.jpg'
 import {
     Link
 } from "react-router-dom";
-import Dropzone, { useDropzone } from 'react-dropzone'
-import { catalogueData } from './mockDataCatalogue';
-import { ImageContainer, CatalogueHeader, NavLink, SubHeading, Heading, VideoContainer, VideoDetailsContainer, PageContainer } from './styled';
-import  { Heading as MainHeading } from '../../components/Heading';
+import Dropzone from 'react-dropzone'
+import { ImageContainer, CatalogueHeader, DropzoneMessage, NavLink, SubHeading, Heading, VideoContainer, VideoDetailsContainer, PageContainer, DropzoneContainer } from './styled';
+import { Heading as MainHeading } from '../../components/Heading';
 import { useFetch } from "./useEffect";
 
 const CataloguePage = () => {
@@ -39,29 +38,30 @@ const CataloguePage = () => {
         <Fragment>
             <PageContainer>
                 <CatalogueHeader>
-                <MainHeading>Video Catalogue</MainHeading>
-                <Dropzone onDrop={handleUploadFile}>
-                    {({ getRootProps, getInputProps }) => (
-                        <section>
-                            <div {...getRootProps()}>
-                                <input {...getInputProps()} />
-                                <p>Drag 'n' drop some files here, or click to select files</p>
+                    <MainHeading>Video Catalogue</MainHeading>
+                    <Dropzone onDrop={handleUploadFile}>
+                        {({ getRootProps, getInputProps }) => (
+                            <div>
+                                <DropzoneContainer {...getRootProps()}>
+                                    <input {...getInputProps()} />
+                                    <DropzoneMessage isDark>Upload new video for analysis</DropzoneMessage>
+                                    <DropzoneMessage>Videos must be in .mp4 format</DropzoneMessage>
+                                </DropzoneContainer>
                             </div>
-                        </section>
-                    )}
-                </Dropzone>
+                        )}
+                    </Dropzone>
                 </CatalogueHeader>
                 {catalogueData.map((data, index) => (
                     <div key={index}>
-                        <NavLink to={`/result/${catalogueData[index].id}`}>
-                            <VideoContainer>
+                        <VideoContainer>
+                            <NavLink to={`/result/${catalogueData[index].id}`}>
                                 <ImageContainer src={VideoImage} ></ImageContainer>
                                 <VideoDetailsContainer>
                                     <Heading>{catalogueData[index].name}</Heading>
                                     <SubHeading>Around {Math.floor(catalogueData[index].durationInSeconds / 60)} minute(s)</SubHeading>
                                 </VideoDetailsContainer>
-                            </VideoContainer>
-                        </NavLink>
+                            </NavLink>
+                        </VideoContainer>
                     </div>
                 ))}
             </PageContainer>
